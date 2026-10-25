@@ -1,15 +1,28 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "types": ["node"],
-    "lib": ["ES2022", "DOM"],
+    "types": ["vite/client", "google.maps", "@testing-library/jest-dom"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "skipLibCheck": true,
+    "moduleResolution": "bundler",
     "isolatedModules": true,
-    "allowImportingTsExtensions": false,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["server/**/*.ts"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist"]
 }
