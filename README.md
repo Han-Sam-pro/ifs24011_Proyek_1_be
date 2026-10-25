@@ -1,46 +1,54 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# RoamPlan — Backend (API)
 
-# Run and deploy your AI Studio app
+API Express.js dengan database libSQL/Turso. Di lokal memakai file SQLite, sedangkan di produksi (Vercel) memakai Turso. Frontend ada di repo `roamplan-frontend`.
 
-This contains everything you need to run your app locally.
+## Endpoint (prefix `/api`)
 
-View your app in AI Studio: https://ai.studio/apps/d8a6abfd-6720-46f6-ab41-934a5bbea202
+| Method | Path | Keterangan |
+| --- | --- | --- |
+| GET | `/api/health` | Cek status server |
+| POST | `/api/auth/register` | Daftar akun, mengembalikan `{ user, token }` |
+| POST | `/api/auth/login` | Masuk, mengembalikan `{ user, token }` |
+| POST | `/api/auth/logout` | Hapus sesi (butuh `Authorization: Bearer <token>`) |
+| GET | `/api/users/me` | Profil pengguna yang sedang masuk |
+| GET | `/api/users` | Daftar pengguna |
+| GET | `/api/trips` | Itinerary milik pengguna |
+| POST | `/api/trips` | Simpan/perbarui itinerary |
+| GET | `/api/cities/suggest?q=` | Saran kota |
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-
-## Backend & Database (SQLite)
-
-Data pengguna dan itinerary disimpan di database SQLite lokal yang dikelola
-oleh backend Express sendiri (`server/`). Tidak ada lagi ketergantungan pada
-API pihak ketiga (open-api.delcom.org).
-
-- File database: `./data/roamplan.db` (bisa diubah lewat env `SQLITE_PATH`)
-- Endpoint API:
-  - `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`
-  - `GET /api/users/me`, `GET /api/users`
-  - `GET /api/trips`, `POST /api/trips` (upsert berdasarkan `id`)
-  - `GET /api/cities/suggest?q=...`, `GET /api/health`
-
-Menjalankan:
+## Menjalankan lokal
 
 ```bash
-npm install
-npm run dev            # development (Express + Vite)
-# atau production:
-npm run build && npm start
+bun install        # atau npm install
+cp .env.example .env
+npm run dev        # server di http://localhost:3001/api
+npm test           # test (memakai file SQLite sementara)
 ```
 
-Catatan: backend membutuhkan host Node.js yang menjalankan proses terus-menerus
-(VPS, Render, Railway, dll.). Netlify hanya men-host frontend statis, sehingga
-fitur akun dan sinkronisasi itinerary tidak berjalan di sana.
+## Deploy ke Vercel + Turso
+
+1. **Buat database di Turso** (gratis, tanpa kartu kredit):
+   ```bash
+   turso db create roamplan
+   turso db show roamplan --url          # -> TURSO_DATABASE_URL
+   turso db tokens create roamplan       # -> TURSO_AUTH_TOKEN
+   ```
+   Tabel dibuat otomatis saat request pertama.
+2. **Import repo ke Vercel**: Add New → Project, pilih repo `roamplan-backend`. Framework preset: *Other*. Tidak perlu build command.
+3. **Isi Environment Variables** di Vercel:
+   - `TURSO_DATABASE_URL`
+   - `TURSO_AUTH_TOKEN`
+   - `CORS_ORIGIN` = URL frontend (mis. `https://<site>.netlify.app`)
+4. Klik **Deploy**. Tes: `https://<project>.vercel.app/api/health`.
+5. Di frontend, set `VITE_API_BASE_URL=https://<project>.vercel.app/api`, lalu redeploy frontend.
+
+Catatan: Vercel menjalankan setiap request sebagai serverless function (`api/[...slug].ts`), sehingga tidak ada file database lokal. Semua data disimpan di Turso.
+
+Batasan paket gratis Vercel Hobby: maksimal 300 detik per request dan penggunaan non-komersial.
+
+## Konfigurasi
+
+- `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` — database produksi
+- `SQLITE_PATH` — file SQLite lokal (hanya jika `TURSO_DATABASE_URL` kosong)
+- `CORS_ORIGIN` — origin frontend yang diizinkan, dipisah koma
+- `PORT` — port server lokal (default `3001`)

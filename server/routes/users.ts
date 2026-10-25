@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { db } from '../db';
-import { PublicUser, requireAuth, toPublicUser } from '../auth';
+import { getDb } from '../db';
+import { PublicUser, requireAuth, toPublicUser, UserRow } from '../auth';
+import { asyncHandler } from '../async';
 
 export const usersRouter = Router();
 
@@ -12,9 +13,10 @@ usersRouter.get('/me', (_req: Request, res: Response) => {
 });
 
 // GET /api/users  -> daftar seluruh pengguna (tanpa password)
-usersRouter.get('/', (_req: Request, res: Response) => {
-  const rows = db
-    .prepare('SELECT id, name, email, photo, created_at FROM users ORDER BY created_at DESC, id DESC')
-    .all() as unknown as Parameters<typeof toPublicUser>[0][];
-  return res.json({ status: 'success', data: { users: rows.map(toPublicUser) } });
-});
+usersRouter.get('/', asyncHandler(async (_req: Request, res: Response) => {
+  const result = await getDb().execute(
+    'SELECT id, name, email, photo, created_at FROM users ORDER BY created_at DESC, id DESC'
+  );
+  const users = (result.rows as unknown as UserRow[]).map(toPublicUser);
+  return res.json({ status: 'success', data: { users } });
+}));

@@ -1,55 +1,83 @@
-import { DatabaseSync } from 'node:sqlite';
+import { createClient, type Client } from '@libsql/client';
 import fs from 'fs';
 import path from 'path';
 
-// Lokasi file database SQLite. Bisa diubah lewat env SQLITE_PATH.
-const DB_PATH =
-  process.env.SQLITE_PATH || path.resolve(process.cwd(), 'data', 'roamplan.db');
+// Database memakai libSQL (kompatibel dengan SQLite):
+// - Produksi (Vercel + Turso): isi TURSO_DATABASE_URL dan TURSO_AUTH_TOKEN.
+// - Lokal / test: jika TURSO_DATABASE_URL kosong, dipakai file SQLite lokal
+//   di SQLITE_PATH (default ./data/roamplan.db).
 
-fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
-
-// node:sqlite adalah SQLite bawaan Node.js (>= 22.13), sehingga tidak perlu
-// addon native dan tidak ada langkah kompilasi saat `bun install` / `npm install`.
-export const db = new DatabaseSync(DB_PATH);
-// Tunggu sampai 5 detik jika database sedang dikunci (mis. beberapa test berjalan paralel)
-db.exec('PRAGMA busy_timeout = 5000;');
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
-
-// Menutup koneksi database. Wajib dipanggil sebelum menghapus file DB (terutama di Windows).
-export function closeDb(): void {
-  try {
-    db.close();
-  } catch {
-    // sudah tertutup
+function resolveDatabaseUrl(): string {
+  if (process.env.TURSO_DATABASE_URL) {
+    return process.env.TURSO_DATABASE_URL;
   }
+  const file = process.env.SQLITE_PATH || path.resolve(process.cwd(), 'data', 'roamplan.db');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  return `file:${file}`;
 }
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
+let client: Client | null = null;
+let schemaReady: Promise<void> | null = null;
+
+// Koneksi dibuat saat pertama kali dibutuhkan (bukan saat modul di-import),
+// sehingga env variable sudah terbaca dan cold start serverless tetap ringan.
+export function getDb(): Client {
+  if (!client) {
+    client = createClient({
+      url: resolveDatabaseUrl(),
+      authToken: process.env.TURSO_AUTH_TOKEN || undefined,
+    });
+  }
+  return client;
+}
+
+const SCHEMA_STATEMENTS = [
+  `CREATE TABLE IF NOT EXISTS users (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     name          TEXT NOT NULL,
     email         TEXT NOT NULL UNIQUE COLLATE NOCASE,
     password_hash TEXT NOT NULL,
     photo         TEXT,
     created_at    TEXT NOT NULL DEFAULT (datetime('now'))
-  );
-
-  CREATE TABLE IF NOT EXISTS sessions (
+  )`,
+  `CREATE TABLE IF NOT EXISTS sessions (
     token      TEXT PRIMARY KEY,
     user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  );
-
-  CREATE TABLE IF NOT EXISTS trips (
+  )`,
+  `CREATE TABLE IF NOT EXISTS trips (
     id               TEXT NOT NULL,
     user_id          INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title            TEXT NOT NULL,
     destination_city TEXT NOT NULL,
-    data             TEXT NOT NULL,            -- seluruh TripPlan dalam JSON
+    data             TEXT NOT NULL,
     updated_at       TEXT NOT NULL DEFAULT (datetime('now')),
     PRIMARY KEY (user_id, id)
-  );
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_trips_user ON trips(user_id)`,
+];
 
-  CREATE INDEX IF NOT EXISTS idx_trips_user ON trips(user_id);
-`);
+// Membuat tabel jika belum ada. Dijalankan sekali per instance (dipanggil dari middleware /api).
+export function ensureSchema(): Promise<void> {
+  if (!schemaReady) {
+    schemaReady = (async () => {
+      const db = getDb();
+      await db.batch(SCHEMA_STATEMENTS, 'write');
+    })().catch((err) => {
+      schemaReady = null; // coba lagi pada request berikutnya
+      throw err;
+    });
+  }
+  return schemaReady;
+}
+
+// Menutup koneksi. Dipakai oleh test agar file database bisa dihapus (terutama di Windows).
+export function closeDb(): void {
+  try {
+    client?.close();
+  } catch {
+    // sudah tertutup
+  }
+  client = null;
+  schemaReady = null;
+}
