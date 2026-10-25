@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { getDb } from '../db';
-import { PublicUser, requireAuth, toPublicUser, UserRow } from '../auth';
-import { asyncHandler } from '../async';
+import { getDb } from '../db.js';
+import { PublicUser, requireAuth, toPublicUser, UserRow } from '../auth.js';
+import { asyncHandler } from '../async.js';
 
 export const usersRouter = Router();
 

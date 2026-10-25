@@ -32,7 +32,7 @@ const makeTrip = (id: string, title: string) => ({
 });
 
 beforeAll(async () => {
-  const { createExpressApp } = await import('../app');
+  const { createExpressApp } = await import('../app.js');
   server = createExpressApp().listen(0, '127.0.0.1');
   await new Promise<void>((resolve) => server.once('listening', () => resolve()));
   const { port } = server.address() as AddressInfo;
@@ -44,7 +44,7 @@ afterAll(async () => {
   server?.closeAllConnections();
   await new Promise<void>((resolve) => server.close(() => resolve()));
 
-  const { closeDb } = await import('../db');
+  const { closeDb } = await import('../db.js');
   closeDb();
 
   // Di Windows, penghapusan bisa gagal sesaat (EPERM) jika file masih dipakai; coba ulang

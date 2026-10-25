@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { authRouter } from './auth';
-import { usersRouter } from './users';
-import { tripsRouter } from './trips';
+import { authRouter } from './auth.js';
+import { usersRouter } from './users.js';
+import { tripsRouter } from './trips.js';
 
 export const apiRouter = Router();
 

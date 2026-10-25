@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
-import { getDb } from './db';
-import { asyncHandler } from './async';
+import { getDb } from './db.js';
+import { asyncHandler } from './async.js';
 
 export interface PublicUser {
   id: number;

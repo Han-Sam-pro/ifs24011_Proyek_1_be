@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { apiRouter } from './routes/api';
-import { corsMiddleware } from './cors';
-import { ensureSchema } from './db';
+import { apiRouter } from './routes/api.js';
+import { corsMiddleware } from './cors.js';
+import { ensureSchema } from './db.js';
 
 export function createExpressApp() {
   const app = express();

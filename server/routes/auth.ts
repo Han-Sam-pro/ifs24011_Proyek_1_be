@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getDb } from '../db';
+import { getDb } from '../db.js';
 import {
   createSession,
   deleteSession,
@@ -8,8 +8,8 @@ import {
   toPublicUser,
   UserRow,
   verifyPassword,
-} from '../auth';
-import { asyncHandler } from '../async';
+} from '../auth.js';
+import { asyncHandler } from '../async.js';
 
 export const authRouter = Router();
 

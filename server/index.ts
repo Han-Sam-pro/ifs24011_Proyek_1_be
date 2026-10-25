@@ -1,4 +1,4 @@
-import { createExpressApp } from './app';
+import { createExpressApp } from './app.js';
 
 // Entry point backend RoamPlan (API saja, tidak menyajikan frontend).
 const PORT = Number(process.env.PORT) || 3001;

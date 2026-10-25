@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { getAllowedOrigins, corsMiddleware } from '../cors';
+import { getAllowedOrigins, corsMiddleware } from '../cors.js';
 
 function runMiddleware(method: string, origin?: string) {
   const headers: Record<string, string> = {};
