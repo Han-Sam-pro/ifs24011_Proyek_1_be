@@ -1,4 +1,4 @@
-import { DatabaseSync } from 'node:sqlite';
+import { createClient } from '@libsql/client';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { config } from './config.js';
@@ -48,12 +48,26 @@ CREATE TABLE IF NOT EXISTS stops (
 CREATE INDEX IF NOT EXISTS idx_stops_trip_day ON stops(trip_id, day_number, position);
 `;
 
-/** Membuka (dan membuat bila perlu) database SQLite, lalu menjalankan skema. */
-export function openDatabase(path = config.dbPath) {
-  if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
-  const db = new DatabaseSync(path);
-  db.exec('PRAGMA foreign_keys = ON;');
-  if (path !== ':memory:') db.exec('PRAGMA journal_mode = WAL;');
-  db.exec(SCHEMA);
+/**
+ * Membuka koneksi libSQL (Turso di produksi, file lokal saat pengembangan) lalu memastikan skema ada.
+ * Skema memakai IF NOT EXISTS sehingga aman dijalankan ulang setiap kali fungsi serverless dinyalakan.
+ * Catatan: foreign key tidak diaktifkan; penghapusan berantai dilakukan eksplisit di layanan.
+ */
+export async function openDatabase({ url = config.dbUrl, authToken = config.dbAuthToken } = {}) {
+  if (url.startsWith('file:') && !url.includes(':memory:')) {
+    mkdirSync(dirname(url.slice('file:'.length)), { recursive: true });
+  }
+  const db = createClient({ url, authToken: authToken || undefined });
+  await db.executeMultiple(SCHEMA);
   return db;
+}
+
+export async function queryOne(db, sql, args = []) {
+  const { rows } = await db.execute({ sql, args });
+  return rows[0];
+}
+
+export async function queryAll(db, sql, args = []) {
+  const { rows } = await db.execute({ sql, args });
+  return rows;
 }

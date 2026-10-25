@@ -20,47 +20,47 @@ export function tripRoutes({ db, requireAuth }) {
   const service = createTripService(db);
   router.use(requireAuth);
 
-  router.get('/', (req, res) => {
+  router.get('/', async (req, res) => {
     const query = String(req.query.q ?? '').trim().slice(0, 100);
-    ok(res, service.list(req.user.id, query));
+    ok(res, await service.list(req.user.id, query));
   });
 
-  router.post('/', (req, res) => {
-    ok(res, service.create(req.user.id, requireValid(validateTrip(req.body))), { status: 201 });
+  router.post('/', async (req, res) => {
+    ok(res, await service.create(req.user.id, requireValid(validateTrip(req.body))), { status: 201 });
   });
 
-  router.get('/:id', (req, res) => {
-    ok(res, service.get(req.user.id, parseId(req.params.id)));
+  router.get('/:id', async (req, res) => {
+    ok(res, await service.get(req.user.id, parseId(req.params.id)));
   });
 
-  router.put('/:id', (req, res) => {
-    ok(res, service.update(req.user.id, parseId(req.params.id), requireValid(validateTrip(req.body))));
+  router.put('/:id', async (req, res) => {
+    ok(res, await service.update(req.user.id, parseId(req.params.id), requireValid(validateTrip(req.body))));
   });
 
-  router.delete('/:id', (req, res) => {
-    ok(res, service.remove(req.user.id, parseId(req.params.id)));
+  router.delete('/:id', async (req, res) => {
+    ok(res, await service.remove(req.user.id, parseId(req.params.id)));
   });
 
-  router.post('/:id/stops', (req, res) => {
+  router.post('/:id/stops', async (req, res) => {
     const values = requireValid(validateStop(req.body));
-    ok(res, service.addStop(req.user.id, parseId(req.params.id), values), { status: 201 });
+    ok(res, await service.addStop(req.user.id, parseId(req.params.id), values), { status: 201 });
   });
 
-  router.put('/:id/stops/:stopId', (req, res) => {
+  router.put('/:id/stops/:stopId', async (req, res) => {
     const values = requireValid(validateStop(req.body));
-    ok(res, service.updateStop(req.user.id, parseId(req.params.id), parseId(req.params.stopId), values));
+    ok(res, await service.updateStop(req.user.id, parseId(req.params.id), parseId(req.params.stopId), values));
   });
 
-  router.delete('/:id/stops/:stopId', (req, res) => {
-    ok(res, service.removeStop(req.user.id, parseId(req.params.id), parseId(req.params.stopId)));
+  router.delete('/:id/stops/:stopId', async (req, res) => {
+    ok(res, await service.removeStop(req.user.id, parseId(req.params.id), parseId(req.params.stopId)));
   });
 
-  router.post('/:id/days/:day/reorder', (req, res) => {
+  router.post('/:id/days/:day/reorder', async (req, res) => {
     const mode = req.body?.mode;
     if (!TRIP_ORDER_MODES.includes(mode)) {
       throw badRequest('Mode urutan tidak valid', { mode: "Pilih 'time' atau 'distance'" });
     }
-    ok(res, service.reorder(req.user.id, parseId(req.params.id), parseId(req.params.day), mode));
+    ok(res, await service.reorder(req.user.id, parseId(req.params.id), parseId(req.params.day), mode));
   });
 
   return router;

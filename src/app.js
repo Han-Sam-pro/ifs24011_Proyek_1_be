@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
-import { openDatabase } from './db.js';
 import { createRequireAuth } from './middleware/auth.js';
 import { errorHandler, notFoundHandler } from './middleware/errors.js';
 import { authRoutes } from './routes/auth.js';
@@ -10,8 +9,8 @@ import { tripRoutes } from './routes/trips.js';
 import { userRoutes } from './routes/users.js';
 import { ok } from './lib/response.js';
 
-/** Membangun aplikasi Express. `db` dapat diganti (mis. ':memory:' untuk pengujian). */
-export function createApp({ db = openDatabase() } = {}) {
+/** Membangun aplikasi Express. `db` adalah klien libSQL yang sudah siap (lihat openDatabase). */
+export function createApp({ db }) {
   const app = express();
   app.disable('x-powered-by');
   app.use(cors({ origin: config.corsOrigins }));

@@ -9,15 +9,15 @@ let db;
 let base;
 
 before(async () => {
-  db = openDatabase(':memory:');
+  db = await openDatabase({ url: 'file::memory:' });
   server = createApp({ db }).listen(0);
   await once(server, 'listening');
   base = `http://127.0.0.1:${server.address().port}/api`;
 });
 
-after(() => {
+after(async () => {
   server.close();
-  db.close();
+  await db.close();
 });
 
 async function call(method, path, { body, token } = {}) {

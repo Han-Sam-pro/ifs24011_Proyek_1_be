@@ -6,12 +6,9 @@ services:
     restart: unless-stopped
     environment:
       JWT_SECRET: "${JWT_SECRET:?isi JWT_SECRET di file .env}"
+      TURSO_DATABASE_URL: "${TURSO_DATABASE_URL:?isi TURSO_DATABASE_URL}"
+      TURSO_AUTH_TOKEN: "${TURSO_AUTH_TOKEN:-}"
       CORS_ORIGINS: "${CORS_ORIGINS:-http://localhost:8080}"
       TRANSPORT_RATE_PER_KM: "${TRANSPORT_RATE_PER_KM:-2500}"
     ports:
       - "${API_PORT:-4000}:4000"
-    volumes:
-      - roamplan-data:/app/data
-
-volumes:
-  roamplan-data:
