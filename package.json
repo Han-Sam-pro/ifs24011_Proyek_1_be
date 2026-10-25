@@ -1,24 +1,30 @@
 {
   "name": "roamplan-backend",
-  "version": "1.0.0",
   "private": true,
+  "version": "1.0.0",
   "type": "module",
-  "description": "Backend Express.js + SQLite untuk RoamPlan - Smart Trip Planner",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
-    "start": "node --disable-warning=ExperimentalWarning src/server.js",
-    "dev": "node --watch --disable-warning=ExperimentalWarning src/server.js",
-    "test": "node --test --disable-warning=ExperimentalWarning 'tests/**/*.test.js'",
-    "test:coverage": "node --test --experimental-test-coverage --disable-warning=ExperimentalWarning 'tests/**/*.test.js'"
+    "dev": "tsx watch server/index.ts",
+    "build": "esbuild server/index.ts --platform=node --format=esm --packages=external --bundle --outfile=dist/index.js",
+    "start": "node dist/index.js",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
-    "bcryptjs": "^3.0.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "express": "^4.21.2"
   },
-  "engines": {
-    "node": ">=22.13"
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.14.0",
+    "@vitest/coverage-v8": "^5.0.5",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
   }
 }

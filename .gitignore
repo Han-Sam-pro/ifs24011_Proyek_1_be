@@ -1,8 +1,12 @@
-node_modules
-data
-coverage
-.env
+node_modules/
+dist/
+coverage/
+.vercel/
+.DS_Store
 *.log
+.env*
+!.env.example
+data/
 *.db
 *.db-wal
 *.db-shm
