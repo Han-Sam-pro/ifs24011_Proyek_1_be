@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    image: roamplan-backend:latest
+    container_name: roamplan-backend
+    restart: unless-stopped
+    environment:
+      JWT_SECRET: "${JWT_SECRET:?isi JWT_SECRET di file .env}"
+      CORS_ORIGINS: "${CORS_ORIGINS:-http://localhost:8080}"
+      TRANSPORT_RATE_PER_KM: "${TRANSPORT_RATE_PER_KM:-2500}"
+    ports:
+      - "${API_PORT:-4000}:4000"
+    volumes:
+      - roamplan-data:/app/data
+
+volumes:
+  roamplan-data:

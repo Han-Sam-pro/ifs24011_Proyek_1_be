@@ -1,0 +1,291 @@
+
+> roamplan-backend@1.0.0 test
+> node --test --disable-warning=ExperimentalWarning 'tests/**/*.test.js'
+
+TAP version 13
+# Subtest: autentikasi
+    # Subtest: registrasi berhasil mengembalikan token dan profil publik
+    ok 1 - registrasi berhasil mengembalikan token dan profil publik
+      ---
+      duration_ms: 258.08822
+      type: 'test'
+      ...
+    # Subtest: registrasi dengan username yang sama ditolak (409)
+    ok 2 - registrasi dengan username yang sama ditolak (409)
+      ---
+      duration_ms: 14.866836
+      type: 'test'
+      ...
+    # Subtest: kata sandi tanpa angka ditolak (400) dengan detail per field
+    ok 3 - kata sandi tanpa angka ditolak (400) dengan detail per field
+      ---
+      duration_ms: 8.975376
+      type: 'test'
+      ...
+    # Subtest: login dengan kata sandi salah ditolak (401)
+    ok 4 - login dengan kata sandi salah ditolak (401)
+      ---
+      duration_ms: 181.31891
+      type: 'test'
+      ...
+    # Subtest: login berhasil dan /auth/me mengenali token
+    ok 5 - login berhasil dan /auth/me mengenali token
+      ---
+      duration_ms: 124.014393
+      type: 'test'
+      ...
+    # Subtest: /auth/me tanpa token ditolak (401)
+    ok 6 - /auth/me tanpa token ditolak (401)
+      ---
+      duration_ms: 4.421224
+      type: 'test'
+      ...
+    # Subtest: registrasi Bob untuk pengujian kepemilikan data
+    ok 7 - registrasi Bob untuk pengujian kepemilikan data
+      ---
+      duration_ms: 124.916169
+      type: 'test'
+      ...
+    1..7
+ok 1 - autentikasi
+  ---
+  duration_ms: 721.241027
+  type: 'suite'
+  ...
+# Subtest: pengguna dan profil
+    # Subtest: daftar pengguna memuat semua akun tanpa email
+    ok 1 - daftar pengguna memuat semua akun tanpa email
+      ---
+      duration_ms: 15.138454
+      type: 'test'
+      ...
+    # Subtest: pencarian pengguna berdasarkan nama
+    ok 2 - pencarian pengguna berdasarkan nama
+      ---
+      duration_ms: 10.816382
+      type: 'test'
+      ...
+    # Subtest: profil dapat diubah
+    ok 3 - profil dapat diubah
+      ---
+      duration_ms: 8.514432
+      type: 'test'
+      ...
+    # Subtest: email yang dipakai akun lain ditolak (409)
+    ok 4 - email yang dipakai akun lain ditolak (409)
+      ---
+      duration_ms: 8.654161
+      type: 'test'
+      ...
+    # Subtest: ganti kata sandi memerlukan kata sandi lama yang benar
+    ok 5 - ganti kata sandi memerlukan kata sandi lama yang benar
+      ---
+      duration_ms: 467.016092
+      type: 'test'
+      ...
+    1..5
+ok 2 - pengguna dan profil
+  ---
+  duration_ms: 511.245906
+  type: 'suite'
+  ...
+# Subtest: rencana perjalanan
+    # Subtest: tanggal selesai sebelum mulai ditolak
+    ok 1 - tanggal selesai sebelum mulai ditolak
+      ---
+      duration_ms: 7.253594
+      type: 'test'
+      ...
+    # Subtest: durasi lebih dari 30 hari ditolak
+    ok 2 - durasi lebih dari 30 hari ditolak
+      ---
+      duration_ms: 4.76232
+      type: 'test'
+      ...
+    # Subtest: membuat rencana menghasilkan satu entri hari per tanggal
+    ok 3 - membuat rencana menghasilkan satu entri hari per tanggal
+      ---
+      duration_ms: 4.730589
+      type: 'test'
+      ...
+    # Subtest: menambah destinasi dengan jam dan biaya
+    ok 4 - menambah destinasi dengan jam dan biaya
+      ---
+      duration_ms: 26.864248
+      type: 'test'
+      ...
+    # Subtest: urutan berdasarkan waktu menaruh destinasi paling pagi di depan
+    ok 5 - urutan berdasarkan waktu menaruh destinasi paling pagi di depan
+      ---
+      duration_ms: 15.284763
+      type: 'test'
+      ...
+    # Subtest: urutan berdasarkan jarak tidak lebih panjang dari urutan waktu
+    ok 6 - urutan berdasarkan jarak tidak lebih panjang dari urutan waktu
+      ---
+      duration_ms: 7.531145
+      type: 'test'
+      ...
+    # Subtest: mode urutan yang tidak dikenal ditolak
+    ok 7 - mode urutan yang tidak dikenal ditolak
+      ---
+      duration_ms: 3.202192
+      type: 'test'
+      ...
+    # Subtest: destinasi di luar rentang hari ditolak
+    ok 8 - destinasi di luar rentang hari ditolak
+      ---
+      duration_ms: 3.161462
+      type: 'test'
+      ...
+    # Subtest: mengubah destinasi dan memindahkannya ke hari lain
+    ok 9 - mengubah destinasi dan memindahkannya ke hari lain
+      ---
+      duration_ms: 3.519967
+      type: 'test'
+      ...
+    # Subtest: mengecilkan rentang tanggal ditolak bila masih ada destinasi di hari yang hilang
+    ok 10 - mengecilkan rentang tanggal ditolak bila masih ada destinasi di hari yang hilang
+      ---
+      duration_ms: 2.97097
+      type: 'test'
+      ...
+    # Subtest: anggaran terlampaui ditandai pada ringkasan daftar
+    ok 11 - anggaran terlampaui ditandai pada ringkasan daftar
+      ---
+      duration_ms: 5.403621
+      type: 'test'
+      ...
+    # Subtest: pencarian rencana berdasarkan judul atau destinasi
+    ok 12 - pencarian rencana berdasarkan judul atau destinasi
+      ---
+      duration_ms: 5.83223
+      type: 'test'
+      ...
+    # Subtest: pengguna lain tidak dapat melihat atau mengubah rencana ini (404)
+    ok 13 - pengguna lain tidak dapat melihat atau mengubah rencana ini (404)
+      ---
+      duration_ms: 6.505938
+      type: 'test'
+      ...
+    # Subtest: menghapus destinasi lalu rencana
+    ok 14 - menghapus destinasi lalu rencana
+      ---
+      duration_ms: 12.836899
+      type: 'test'
+      ...
+    # Subtest: akses tanpa token ke rencana ditolak (401)
+    ok 15 - akses tanpa token ke rencana ditolak (401)
+      ---
+      duration_ms: 2.992122
+      type: 'test'
+      ...
+    1..15
+ok 3 - rencana perjalanan
+  ---
+  duration_ms: 114.172249
+  type: 'suite'
+  ...
+# Subtest: rute tidak dikenal mengembalikan 404 dengan format error
+ok 4 - rute tidak dikenal mengembalikan 404 dengan format error
+  ---
+  duration_ms: 3.712288
+  type: 'test'
+  ...
+# Subtest: haversineKm
+    # Subtest: Jakarta ke Bandung sekitar 120 km (garis lurus)
+    ok 1 - Jakarta ke Bandung sekitar 120 km (garis lurus)
+      ---
+      duration_ms: 3.60066
+      type: 'test'
+      ...
+    # Subtest: titik yang sama berjarak nol
+    ok 2 - titik yang sama berjarak nol
+      ---
+      duration_ms: 0.439974
+      type: 'test'
+      ...
+    # Subtest: simetris
+    ok 3 - simetris
+      ---
+      duration_ms: 0.19914
+      type: 'test'
+      ...
+    1..3
+ok 5 - haversineKm
+  ---
+  duration_ms: 5.465973
+  type: 'suite'
+  ...
+# Subtest: tanggal
+    # Subtest: dayCount bersifat inklusif
+    ok 1 - dayCount bersifat inklusif
+      ---
+      duration_ms: 0.313446
+      type: 'test'
+      ...
+    # Subtest: addDaysIso melewati akhir bulan
+    ok 2 - addDaysIso melewati akhir bulan
+      ---
+      duration_ms: 0.474081
+      type: 'test'
+      ...
+    1..2
+ok 6 - tanggal
+  ---
+  duration_ms: 1.080208
+  type: 'suite'
+  ...
+# Subtest: urutan kunjungan
+    # Subtest: sortByTime menaruh jam kedatangan lebih dulu dan tanpa jam di belakang
+    ok 1 - sortByTime menaruh jam kedatangan lebih dulu dan tanpa jam di belakang
+      ---
+      duration_ms: 13.348953
+      type: 'test'
+      ...
+    # Subtest: sortByDistance mengurangi total jarak dibandingkan urutan awal
+    ok 2 - sortByDistance mengurangi total jarak dibandingkan urutan awal
+      ---
+      duration_ms: 0.937906
+      type: 'test'
+      ...
+    # Subtest: sortByDistance pada daftar kosong mengembalikan daftar kosong
+    ok 3 - sortByDistance pada daftar kosong mengembalikan daftar kosong
+      ---
+      duration_ms: 0.2861
+      type: 'test'
+      ...
+    1..3
+ok 7 - urutan kunjungan
+  ---
+  duration_ms: 15.037803
+  type: 'suite'
+  ...
+# Subtest: estimasi biaya
+    # Subtest: menjumlahkan biaya aktivitas dan transportasi, lalu menandai melebihi anggaran
+    ok 1 - menjumlahkan biaya aktivitas dan transportasi, lalu menandai melebihi anggaran
+      ---
+      duration_ms: 0.693262
+      type: 'test'
+      ...
+    # Subtest: anggaran nol berarti tidak ada batas dan tidak pernah melebihi
+    ok 2 - anggaran nol berarti tidak ada batas dan tidak pernah melebihi
+      ---
+      duration_ms: 0.422166
+      type: 'test'
+      ...
+    1..2
+ok 8 - estimasi biaya
+  ---
+  duration_ms: 1.33005
+  type: 'suite'
+  ...
+1..8
+# tests 38
+# suites 7
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1826.374934
